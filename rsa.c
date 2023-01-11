@@ -4,7 +4,7 @@
 #include <string.h>
 #include <limits.h>
 
-/* FR: Accurance avec laquelle nous testons pour les nombres premiers en utilisant l'algorithme de Solovay-Strassen.
+/* Accurance avec laquelle nous testons pour les nombres premiers en utilisant l'algorithme de Solovay-Strassen.
  * 20 Tests devrait être suffisant pour la plupart des nombres premiers de taille moyenne
  */
 #define ACCURACY 20
@@ -13,20 +13,20 @@
 #define EXPONENT_MAX RAND_MAX
 #define BUF_SIZE 1024
 
-/* FR: Capacité initiale pour une structure bignum. Ils s'élargiront de manière flexible mais cela
+/* Capacité initiale pour une structure bignum. Ils s'élargiront de manière flexible mais cela
  * devrait être raisonnablement élevé pour éviter des reallocs fréquents tôt */
 
 #define BIGNUM_CAPACITY 20
 
 /* Radix and halfradix. These should be changed if the limb/word type changes */
-/* FR: Radix et demi-radix. Ceux-ci devraient être changés si le type de membre / mot change */
+/* Radix et demi-radix. Ceux-ci devraient être changés si le type de membre / mot change */
 #define RADIX 4294967296UL
 #define HALFRADIX 2147483648UL
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 /**
- * FR: Type de membre de base. Notez que certaines calculs dépendent de l'overflow non signé de ce type.
+ * Type de membre de base. Notez que certaines calculs dépendent de l'overflow non signé de ce type.
  * En conséquence, seuls les types non signés doivent être utilisés ici, et le RADIX, HALFRADIX ci-dessus devraient être
  * changé si nécessaire. Entier non signé devrait probablement être le type de mot le plus efficace, et ceci
  * est utilisé par GMP par exemple.
@@ -34,7 +34,7 @@
 typedef unsigned int word;
 
 /**
- * FR: Structure pour représenter des entiers multiples de précision. Ceci est une base "mot" LSB
+ * Structure pour représenter des entiers multiples de précision. Ceci est une base "mot" LSB
  * représentation. Dans ce cas, la base, le mot, est 2 ^ 32. La longueur est le nombre de mots
  * dans la représentation actuelle. La longueur ne devrait pas permettre des zéros de queue (Choses comme 000124). La capacité est le nombre de mots alloués pour les données de membre.
  */
@@ -46,7 +46,7 @@ typedef struct _bignum
 } bignum;
 
 /**
- * FR: Quelques déclarations de forward comme ceci a été demandé d'être un seul fichier.
+ * Quelques déclarations de forward comme ceci a été demandé d'être un seul fichier.
  * Voir les fonctions spécifiques pour les explications.
  */
 void bignum_iadd(bignum *source, bignum *add);
@@ -62,7 +62,7 @@ void bignum_imodulate(bignum *source, bignum *modulus);
 void bignum_divide(bignum *quotient, bignum *remainder, bignum *b1, bignum *b2);
 
 /**
- * FR: Sauvegarder quelques entiers multiples de précision fréquemment utilisés (0 - 10) afin qu'ils n'aient pas besoin d'être répétés
+ * Sauvegarder quelques entiers multiples de précision fréquemment utilisés (0 - 10) afin qu'ils n'aient pas besoin d'être répétés
  */
 word DATA0[1] = {0};
 word DATA1[1] = {1};
@@ -78,7 +78,7 @@ word DATA10[1] = {10};
 bignum NUMS[11] = {{1, 1, DATA0}, {1, 1, DATA1}, {1, 1, DATA2}, {1, 1, DATA3}, {1, 1, DATA4}, {1, 1, DATA5}, {1, 1, DATA6}, {1, 1, DATA7}, {1, 1, DATA8}, {1, 1, DATA9}, {1, 1, DATA10}};
 
 /**
- * FR: Initialiser une structure bignum. C'est le seul moyen de créer en toute sécurité un bignum
+ * Initialiser une structure bignum. C'est le seul moyen de créer en toute sécurité un bignum
  * et devrait être appelé où que l'un est déclaré. (Nous realloc la mémoire dans tous les autres cas
  * qui est techniquement sûr, mais peut causer des problèmes lorsque nous allons à libérer
  */
@@ -92,7 +92,7 @@ bignum *bignum_init()
 }
 
 /**
- * FR: Libérer les ressources utilisées par un bignum. Utiliser avec prudence pour éviter les fuites de mémoire.
+ * Libérer les ressources utilisées par un bignum. Utiliser avec prudence pour éviter les fuites de mémoire.
  */
 void bignum_deinit(bignum *b)
 {
@@ -112,7 +112,7 @@ int bignum_isnonzero(bignum *b)
     return !bignum_iszero(b);
 }
 
-// FR: Copier du bignum source dans le bignum de destination.
+// Copier du bignum source dans le bignum de destination.
 void bignum_copy(bignum *source, bignum *dest)
 {
     dest->length = source->length;
@@ -124,7 +124,7 @@ void bignum_copy(bignum *source, bignum *dest)
     memcpy(dest->data, source->data, dest->length * sizeof(word));
 }
 
-// FR: Charger un bignum à partir d'une chaîne de base 10. Seules les chaînes numériques pures fonctionneront.
+// Charger un bignum à partir d'une chaîne de base 10. Seules les chaînes numériques pures fonctionneront.
 void bignum_fromstring(bignum *b, char *string)
 {
     int i, len = 0;
@@ -133,7 +133,7 @@ void bignum_fromstring(bignum *b, char *string)
     for (i = 0; i < len; i++)
     {
         if (i != 0)
-            bignum_imultiply(b, &NUMS[10]); // FR: Multiplier par 10
+            bignum_imultiply(b, &NUMS[10]); // Multiplier par 10
         bignum_iadd(b, &NUMS[string[i] - '0']);
     }
 }
@@ -141,7 +141,7 @@ void bignum_fromstring(bignum *b, char *string)
 /**
  * Load a bignum from an unsigned integer.
  */
-// FR: Charger un bignum à partir d'un entier non signé.
+// Charger un bignum à partir d'un entier non signé.
 void bignum_fromint(bignum *b, unsigned int num)
 {
     b->length = 1;
@@ -154,7 +154,7 @@ void bignum_fromint(bignum *b, unsigned int num)
 }
 
 /**
- * FR: Imprimer un bignum sur stdout comme entier de base 10. Ceci est fait par
+ * Imprimer un bignum sur stdout comme entier de base 10. Ceci est fait par
  * division répétée par 10. Nous pouvons le rendre plus efficace en divisant par
  * 10^9 par exemple, puis en faisant de l'arithmétique à précision simple pour récupérer le
  * 9 restes
@@ -247,19 +247,19 @@ int bignum_less(bignum *b1, bignum *b2)
     return 0;
 }
 
-// FR: Vérifier si le bignum b1 est supérieur ou égal au bignum b2
+// Vérifier si le bignum b1 est supérieur ou égal au bignum b2
 int bignum_geq(bignum *b1, bignum *b2)
 {
     return !bignum_less(b1, b2);
 }
 
-// FR: Vérifier si le bignum b1 est inférieur ou égal au bignum b2
+// Vérifier si le bignum b1 est inférieur ou égal au bignum b2
 int bignum_leq(bignum *b1, bignum *b2)
 {
     return !bignum_greater(b1, b2);
 }
 
-// FR: Effectuer une addition in place dans le bignum source. C'est à dire source += add
+// Effectuer une addition in place dans le bignum source. C'est à dire source += add
 void bignum_iadd(bignum *source, bignum *add)
 {
     bignum *temp = bignum_init();
@@ -268,7 +268,7 @@ void bignum_iadd(bignum *source, bignum *add)
     bignum_deinit(temp);
 }
 
-// FR: Additionner deux bignums par la méthode add with carry. result = b1 + b2
+// Additionner deux bignums par la méthode add with carry. result = b1 + b2
 void bignum_add(bignum *result, bignum *b1, bignum *b2)
 {
     word sum, carry = 0;
@@ -285,19 +285,19 @@ void bignum_add(bignum *result, bignum *b1, bignum *b2)
             sum += b1->data[i];
         if (i < b2->length)
             sum += b2->data[i];
-        result->data[i] = sum; // FR: On a déjà pris le modulo 2^32 par le débordement de l'entier signé
+        result->data[i] = sum; // On a déjà pris le modulo 2^32 par le débordement de l'entier signé
 
         if (i < b1->length)
         {
             if (sum < b1->data[i])
-                carry = 1; // FR: Si le résultat est inférieur à la valeur du premier bignum, alors il y a eu un débordement
+                carry = 1; // Si le résultat est inférieur à la valeur du premier bignum, alors il y a eu un débordement
             else
                 carry = 0;
         }
         else
         {
             if (sum < b2->data[i])
-                carry = 1; // FR: Si le résultat est inférieur à la valeur du deuxième bignum, alors il y a eu un débordement
+                carry = 1; // Si le résultat est inférieur à la valeur du deuxième bignum, alors il y a eu un débordement
             else
                 carry = 0;
         }
@@ -361,7 +361,7 @@ void bignum_subtract(bignum *result, bignum *b1, bignum *b2)
     result->length = length;
 }
 
-// FR: Effectuer une multiplication in place dans le bignum source. C'est à dire source *= mult
+// Effectuer une multiplication in place dans le bignum source. C'est à dire source *= mult
 void bignum_imultiply(bignum *source, bignum *mult)
 {
     bignum *temp = bignum_init();
@@ -396,7 +396,7 @@ void bignum_multiply(bignum *result, bignum *b1, bignum *b2)
             prod = (b1->data[i] * (unsigned long long int)b2->data[j]) + (unsigned long long int)(result->data[i + j]); /* This should not overflow... */
             carry = (word)(prod / RADIX);
 
-            // FR: Ajouter la retenue au mot suivant, mais cela peut causer un débordement... propager
+            // Ajouter la retenue au mot suivant, mais cela peut causer un débordement... propager
             k = 1;
             while (carry > 0)
             {
@@ -419,7 +419,7 @@ void bignum_multiply(bignum *result, bignum *b1, bignum *b2)
         result->length = b1->length + b2->length;
 }
 
-// FR: Effectuer une division in place dans le bignum source. C'est à dire source /= div
+// Effectuer une division in place dans le bignum source. C'est à dire source /= div
 void bignum_idivide(bignum *source, bignum *div)
 {
     bignum *q = bignum_init(), *r = bignum_init();
@@ -443,7 +443,7 @@ void bignum_idivider(bignum *source, bignum *div, bignum *remainder)
     bignum_deinit(r);
 }
 
-// FR: Calculer le reste de la division de source par div.
+// Calculer le reste de la division de source par div.
 void bignum_remainder(bignum *source, bignum *div, bignum *remainder)
 {
     bignum *q = bignum_init();
@@ -451,7 +451,7 @@ void bignum_remainder(bignum *source, bignum *div, bignum *remainder)
     bignum_deinit(q);
 }
 
-// FR: Moduler le source par le modulus. source = source % modulus
+// Moduler le source par le modulus. source = source % modulus
 void bignum_imodulate(bignum *source, bignum *modulus)
 {
     bignum *q = bignum_init(), *r = bignum_init();
@@ -483,7 +483,7 @@ void bignum_divide(bignum *quotient, bignum *remainder, bignum *b1, bignum *b2)
     }
     else if (bignum_iszero(b1))
     {
-        // FR: Si b1 est nul, le quotient est nul et le reste est nul.
+        // Si b1 est nul, le quotient est nul et le reste est nul.
         quotient->length = 0;
         bignum_fromint(remainder, 0);
     }
@@ -548,7 +548,7 @@ void bignum_divide(bignum *quotient, bignum *remainder, bignum *b1, bignum *b2)
             b1copy->data[n - 1] = 0;
         }
 
-        // FR: Calculer le quotient par division longue.
+        // Calculer le quotient par division longue.
         for (i = n - m - 1; i >= 0; i--)
         {
             gtemp = RADIX * b1copy->data[i + m] + b1copy->data[i + m - 1];
@@ -824,8 +824,8 @@ void randPrime(int numDigits, bignum *result)
 {
     char *string = malloc((numDigits + 1) * sizeof(char));
     int i;
-    string[0] = (rand() % 9) + '1';                 // Fr: Pas de zéros initiaux
-    string[numDigits - 1] = (rand() % 5) * 2 + '1'; // Fr: Dernier chiffre impair
+    string[0] = (rand() % 9) + '1';                 // Pas de zéros initiaux
+    string[numDigits - 1] = (rand() % 5) * 2 + '1'; // Dernier chiffre impair
     for (i = 1; i < numDigits - 1; i++)
         string[i] = (rand() % 10) + '0';
     string[numDigits] = '\0';
@@ -897,13 +897,13 @@ int readFile(FILE *fd, char **buffer, int bytes)
     return len;
 }
 
-// Fr: Chiffrer le message m en utilisant l'exposant public et le module, résultat = m^e mod n
+// Chiffrer le message m en utilisant l'exposant public et le module, résultat = m^e mod n
 void encode(bignum *m, bignum *e, bignum *n, bignum *result)
 {
     bignum_modpow(m, e, n, result);
 }
 
-// Fr: Déchiffrer le cryptogramme c en utilisant l'exposant privé et le module, résultat = c^d mod n
+// Déchiffrer le cryptogramme c en utilisant l'exposant privé et le module, résultat = c^d mod n
 void decode(bignum *c, bignum *d, bignum *n, bignum *result)
 {
     bignum_modpow(c, d, n, result);
@@ -919,7 +919,7 @@ bignum *encodeMessage(int len, int bytes, char *message, bignum *exponent, bignu
 {
 
     /*
-        Fr: calloc fonctionne ici car la capacité = 0 force un realloc par les appelants mais nous devrions vraiment
+        calloc fonctionne ici car la capacité = 0 force un realloc par les appelants mais nous devrions vraiment
         bignum_init() tous ces
     */
     int i, j;
@@ -932,7 +932,7 @@ bignum *encodeMessage(int len, int bytes, char *message, bignum *exponent, bignu
     {
         bignum_fromint(x, 0);
         bignum_fromint(num128pow, 1);
-        /*  Fr: Calculer buffer[0] + buffer[1]*128 + buffer[2]*128^2 etc (représentation de base 128 pour le codage des caractères->int)
+        /*  Calculer buffer[0] + buffer[1]*128 + buffer[2]*128^2 etc (représentation de base 128 pour le codage des caractères->int)
          */
         for (j = 0; j < bytes; j++)
         {
@@ -981,7 +981,7 @@ int *decodeMessage(int len, int bytes, bignum *cryptogram, bignum *exponent, big
 }
 
 /**
- * Fr: Méthode principale pour démontrer le système. Définir les nombres premiers p, q, et procéder à chiffrer et déchiffrer le message donné dans "text.txt"
+ * Méthode principale pour démontrer le système. Définir les nombres premiers p, q, et procéder à chiffrer et déchiffrer le message donné dans "text.txt"
  */
 int main(void)
 {
@@ -1044,14 +1044,14 @@ int main(void)
     printf(") ... ");
     getchar();
 
-    // Fr: Calculer le nombre de caractères que l'on peut encoder dans un bloc de chiffrement
+    // Calculer le nombre de caractères que l'on peut encoder dans un bloc de chiffrement
     bytes = -1;
     bignum_fromint(shift, 1 << 7); /* 7 bits per char */
     bignum_fromint(bbytes, 1);
     while (bignum_less(bbytes, n))
     {
 
-        // FR: Décaler d'un octet, NB: on utilise la représentation par masque binaire, donc on peut utiliser un décalage
+        // Décaler d'un octet, NB: on utilise la représentation par masque binaire, donc on peut utiliser un décalage
         bignum_imultiply(bbytes, shift);
         bytes++;
     }
