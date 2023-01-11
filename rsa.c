@@ -910,15 +910,18 @@ void decode(bignum *c, bignum *d, bignum *n, bignum *result)
 }
 
 /**
- * Encode the message of given length, using the public key (exponent, modulus)
- * The resulting array will be of size len/bytes, each index being the encryption
- * of "bytes" consecutive characters, given by m = (m1 + m2*128 + m3*128^2 + ..),
+ * Chiffrer le message de longueur donnée, en utilisant la clé publique (exposant, module)
+ * Le tableau résultant aura une taille de len/bytes, chaque index étant le chiffrement
+ * de "bytes" caractères consécutifs, donné par m = (m1 + m2*128 + m3*128^2 + ..),
  * encoded = m^exponent mod modulus
  */
 bignum *encodeMessage(int len, int bytes, char *message, bignum *exponent, bignum *modulus)
 {
-    /* Calloc works here because capacity = 0 forces a realloc by callees but we should really
-     * bignum_init() all of these */
+
+    /*
+        Fr: calloc fonctionne ici car la capacité = 0 force un realloc par les appelants mais nous devrions vraiment
+        bignum_init() tous ces
+    */
     int i, j;
     bignum *encoded = calloc(len / bytes, sizeof(bignum));
     bignum *num128 = bignum_init(), *num128pow = bignum_init();
@@ -929,12 +932,13 @@ bignum *encodeMessage(int len, int bytes, char *message, bignum *exponent, bignu
     {
         bignum_fromint(x, 0);
         bignum_fromint(num128pow, 1);
-        /* Compute buffer[0] + buffer[1]*128 + buffer[2]*128^2 etc (base 128 representation for characters->int encoding)*/
+        /*  Fr: Calculer buffer[0] + buffer[1]*128 + buffer[2]*128^2 etc (représentation de base 128 pour le codage des caractères->int)
+         */
         for (j = 0; j < bytes; j++)
         {
             bignum_fromint(current, message[i + j]);
             bignum_imultiply(current, num128pow);
-            bignum_iadd(x, current); /*x += buffer[i + j] * (1 << (7 * j)) */
+            bignum_iadd(x, current); // x += buffer[i + j] * (1 << (7 * j))
             bignum_imultiply(num128pow, num128);
         }
         encode(x, exponent, modulus, &encoded[i / bytes]);
@@ -947,9 +951,9 @@ bignum *encodeMessage(int len, int bytes, char *message, bignum *exponent, bignu
 }
 
 /**
- * Decode the cryptogram of given length, using the private key (exponent, modulus)
- * Each encrypted packet should represent "bytes" characters as per encodeMessage.
- * The returned message will be of size len * bytes.
+ * Déchiffrer le cryptogramme de longueur donnée, en utilisant la clé privée (exposant, module)
+ * Chaque paquet chiffré doit représenter "bytes" caractères comme par encodeMessage.
+ * Le message retourné aura une taille de len * bytes.
  */
 int *decodeMessage(int len, int bytes, bignum *cryptogram, bignum *exponent, bignum *modulus)
 {
@@ -977,8 +981,7 @@ int *decodeMessage(int len, int bytes, bignum *cryptogram, bignum *exponent, big
 }
 
 /**
- * Main method to demostrate the system. Sets up primes p, q, and proceeds to encode and
- * decode the message given in "text.txt"
+ * Fr: Méthode principale pour démontrer le système. Définir les nombres premiers p, q, et procéder à chiffrer et déchiffrer le message donné dans "text.txt"
  */
 int main(void)
 {
@@ -1042,6 +1045,7 @@ int main(void)
     getchar();
 
     /* Compute maximum number of bytes that can be encoded in one encryption */
+    //
     bytes = -1;
     bignum_fromint(shift, 1 << 7); /* 7 bits per char */
     bignum_fromint(bbytes, 1);
