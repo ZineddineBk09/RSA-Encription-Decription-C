@@ -1044,14 +1044,15 @@ int main(void)
     printf(") ... ");
     getchar();
 
-    /* Compute maximum number of bytes that can be encoded in one encryption */
-    //
+    // Fr: Calculer le nombre de caractères que l'on peut encoder dans un bloc de chiffrement
     bytes = -1;
     bignum_fromint(shift, 1 << 7); /* 7 bits per char */
     bignum_fromint(bbytes, 1);
     while (bignum_less(bbytes, n))
     {
-        bignum_imultiply(bbytes, shift); /* Shift by one byte, NB: we use bitmask representative so this can actually be a shift... */
+
+        // FR: Décaler d'un octet, NB: on utilise la représentation par masque binaire, donc on peut utiliser un décalage
+        bignum_imultiply(bbytes, shift);
         bytes++;
     }
 
@@ -1062,7 +1063,7 @@ int main(void)
         printf("Failed to open file \"text.txt\". Does it exist?\n");
         return EXIT_FAILURE;
     }
-    len = readFile(f, &buffer, bytes); /* len will be a multiple of bytes, to send whole chunks */
+    len = readFile(f, &buffer, bytes);
 
     printf("File \"text.txt\" read successfully, %d bytes read. Encoding byte stream in chunks of %d bytes ... ", len, bytes);
     getchar();
@@ -1077,7 +1078,6 @@ int main(void)
     decoded = decodeMessage(len / bytes, bytes, encoded, d, n);
     printf("\n\nFinished RSA demonstration!");
 
-    /* Eek! This is why we shouldn't of calloc'd those! */
     for (i = 0; i < len / bytes; i++)
         free(encoded[i].data);
     free(encoded);
