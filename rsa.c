@@ -981,7 +981,7 @@ int *decodeMessage(int len, int bytes, bignum *cryptogram, bignum *exponent, big
 }
 
 /**
- * Méthode principale pour démontrer le système. Définir les nombres premiers p, q, et procéder à chiffrer et déchiffrer le message donné dans "text.txt"
+ * Méthode principale pour démontrer le système. Définir les nombres premiers p, q, et procéder à chiffrer et déchiffrer le message donné dans "message_M.txt"
  */
 int main(void)
 {
@@ -1056,16 +1056,16 @@ int main(void)
         bytes++;
     }
 
-    printf("Opening file \"text.txt\" for reading\n");
-    f = fopen("text.txt", "r");
+    printf("Opening file \"message_M.txt\" for reading\n");
+    f = fopen("message_M.txt", "r");
     if (f == NULL)
     {
-        printf("Failed to open file \"text.txt\". Does it exist?\n");
+        printf("Failed to open file \"message_M.txt\". Does it exist?\n");
         return EXIT_FAILURE;
     }
     len = readFile(f, &buffer, bytes);
 
-    printf("File \"text.txt\" read successfully, %d bytes read. Encoding byte stream in chunks of %d bytes ... ", len, bytes);
+    printf("File \"message_M.txt\" read successfully, %d bytes read. Encoding byte stream in chunks of %d bytes ... ", len, bytes);
     getchar();
     printf("\n");
     encoded = encodeMessage(len, bytes, buffer, e, n);
@@ -1098,13 +1098,4 @@ int main(void)
     return EXIT_SUCCESS;
 }
 
-// now let's analyse the complexity of the algorithm in space and time
-
-// we have 3 functions, each of which has a complexity of O(n^2)
-// so the total complexity is O(n^2) + O(n^2) + O(n^2) = O(n^2), where n is the length of the input
-
-// the space complexity is O(n) + O(n) + O(n) = O(n)
-// also the time complexity depends on the length of our key, which is O(n^2)
-// so the total time complexity is O(n^2) + O(n^2) + O(n^2) = O(n^2)
-
-// if you disagree with my analysis, please let me know in the comments or contact me on my website or email
+// now let's analyse the complexity of the algorithm in time
