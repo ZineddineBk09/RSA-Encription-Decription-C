@@ -1098,4 +1098,115 @@ int main(void)
     return EXIT_SUCCESS;
 }
 
-// now let's analyse the complexity of the algorithm in time
+/**
+ * RSA (Ronald Rivest, Adi Shamir et Leonard Adleman): C’est un algorithme de cryptage asymétrique basé sur deux clés une publique utilisé pour le chiffrement et une clé privé pour le déchiffrement. Il chiffrement se base sur le calcul du modulo et le déchiffrement sur le calcul de l’inverse module. De manière générale, il se base sur l’exponentiation modulaire.
+Il est question pour cette algorithme de :
+    • Donner l’algorithme de cryptage et de décryptage RSA d’un message M sachant les clés.
+    • Préciser les structures de données nécessaires
+    • Identifier les paramètres clés des algorithmes qui vont directement ou indirectement influer sur la complexité
+    • Analyse et calculer la complexité temporelles et spatiales des algorithmes.
+    • Implémenter les algorithmes dans le langage de votre choix.
+    • Analyser la complexité pratique en présentant les différents graphes qui illustrent l’évolution des temps d’exécution en fonction des différents paramètres.
+*/
+
+/**
+ * Structure de données utilisées:
+ * - bignum: structure de données représentant un entier de taille arbitraire
+ * - bignum *encoded: tableau de bignum représentant le message encodé
+ * - int *decoded: tableau d'entier représentant le message décodé
+ * - char *buffer: tableau de caractère représentant le message lu dans le fichier
+ * - FILE *f: pointeur sur le fichier lu "message_M.txt"
+ * - int bytes: nombre de caractères que l'on peut encoder dans un bloc de chiffrement
+ * - int len: nombre de caractères du message lu dans le fichier
+ * - int i: compteur
+ */
+
+/**
+ * Paramètres clés des algorithmes:
+ * - bignum *p: premier facteur du module
+ * - bignum *q: second facteur du module
+ * - bignum *n: module
+ * - bignum *phi: totient
+ * - bignum *e: exposant public
+ * - bignum *d: exposant privé
+ * - bignum *bbytes: nombre de caractères encodés dans un bloc de chiffrement
+ * - bignum *shift: décalage d'un octet
+ * - bignum *temp1: variable temporaire
+ * - bignum *temp2: variable temporaire
+ */
+
+/**
+ * Complexité temporelle:
+ * - bignum_fromint: O(1)
+ * - bignum_frombytes: O(n)
+ * - bignum_fromstr: O(n)
+ * - bignum_frombignum: O(n)
+ * - bignum_tostr: O(n)
+ * - bignum_tobytes: O(n)
+ * - bignum_print: O(n)
+ * - bignum_deinit: O(1)
+ * - bignum_add: O(n)
+ * - bignum_sub: O(n)
+ * - bignum_imultiply: O(n^2)
+ * - bignum_idivide: O(n^2)
+ * - bignum_imod: O(n^2)
+ * - bignum_imodinv: O(n^3)
+ * - bignum_less: O(n)
+ */
+
+/**
+ * Complexité spatiale:
+ * - bignum_fromint: O(1)
+ * - bignum_frombytes: O(n)
+ * - bignum_fromstr: O(n)
+ * - bignum_frombignum: O(n)
+ * - bignum_tostr: O(n)
+ * - bignum_tobytes: O(n)
+ * - bignum_print: O(1)
+ * - bignum_deinit: O(1)
+ * - bignum_add: O(n)
+ * - bignum_sub: O(n)
+ * - bignum_imultiply: O(n)
+ * - bignum_idivide: O(n)
+ * - bignum_imod: O(n)
+ * - bignum_imodinv: O(n)
+ * - bignum_less: O(1)
+ */
+
+/**
+ * Complexité totale d'algorithme de cryptage est de O(n^2)
+ * Complexité totale d'algorithme de décryptage est de O(n^3)
+ * Complexité totale d'algorithme de génération de clé est de O(n^3)
+ */
+
+/**
+ * Complexité pratique:
+ * - bignum_fromint: O(1)
+ * - bignum_frombytes: O(n)
+ * - bignum_fromstr: O(n)
+ * - bignum_frombignum: O(n)
+ * - bignum_tostr: O(n)
+ * - bignum_tobytes: O(n)
+ * - bignum_print: O(1)
+ * - bignum_deinit: O(1)
+ * - bignum_add: O(n)
+ * - bignum_sub: O(n)
+ * - bignum_imultiply: O(n^2)
+ * - bignum_idivide: O(n^2)
+ * - bignum_imod: O(n^2)
+ * - bignum_imodinv: O(n^3)
+ * - bignum_less: O(1)
+ */
+
+/**
+ * Complexité pratique totale d'algorithme de cryptage est de : O(n^2)
+ * Complexité pratique totale d'algorithme de décryptage est de : O(n^3)
+ * Complexité pratique totale d'algorithme de génération de clé est de : O(n^3)
+ */
+
+/**
+ * Graphes:
+ * - Génération de clé: T(n) = a*n^3 + b*n^2 + c*n + d
+ * - Cryptage: T(n) = a*n^2 + b*n + c
+ * - Décryptage: T(n) = a*n^3 + b*n^2 + c*n + d
+ */
