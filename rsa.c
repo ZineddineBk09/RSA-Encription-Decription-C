@@ -837,13 +837,13 @@ void randPrime(int numDigits, bignum *result)
             free(string);
             return;
         }
-        bignum_iadd(result, &NUMS[2]); /* result += 2 */
+        bignum_iadd(result, &NUMS[2]); // result += 2
     }
 }
 
 /**
- * Choose a random public key exponent for the RSA algorithm. The exponent will
- * be less than the modulus, n, and coprime to phi.
+ * Choisir un exposant de clé publique aléatoire pour l'algorithme RSA. L'exposant sera
+ * inférieur au module, n, et coprime à phi.
  */
 void randExponent(bignum *phi, int n, bignum *result)
 {
@@ -865,9 +865,9 @@ void randExponent(bignum *phi, int n, bignum *result)
 }
 
 /**
- * Read the file fd into an array of bytes ready for encryption.
- * The array will be padded with zeros until it divides the number of
- * bytes encrypted per block. Returns the number of bytes read.
+ * Lire le fichier fd dans un tableau d'octets prêt pour le chiffrement.
+ * Le tableau sera rempli de zéros jusqu'à ce qu'il divise le nombre d'octets
+ * chiffrés par bloc. Retourne le nombre d'octets lus.
  */
 int readFile(FILE *fd, char **buffer, int bytes)
 {
@@ -884,7 +884,9 @@ int readFile(FILE *fd, char **buffer, int bytes)
         memcpy(&(*buffer)[len], buf, r);
         len += r;
     }
-    /* Pad the last block with zeros to signal end of cryptogram. An additional block is added if there is no room */
+    /*
+        Remplir le dernier bloc avec des zéros pour signaler la fin du cryptogramme. Un bloc supplémentaire est ajouté s'il n'y a pas de place
+    */
     if (len + bytes - len % bytes > cap)
         *buffer = realloc(*buffer, len + bytes - len % bytes);
     do
@@ -895,17 +897,13 @@ int readFile(FILE *fd, char **buffer, int bytes)
     return len;
 }
 
-/**
- * Encode the message m using public exponent and modulus, result = m^e mod n
- */
+// Fr: Chiffrer le message m en utilisant l'exposant public et le module, résultat = m^e mod n
 void encode(bignum *m, bignum *e, bignum *n, bignum *result)
 {
     bignum_modpow(m, e, n, result);
 }
 
-/**
- * Decode cryptogram c using private exponent and public modulus, result = c^d mod n
- */
+// Fr: Déchiffrer le cryptogramme c en utilisant l'exposant privé et le module, résultat = c^d mod n
 void decode(bignum *c, bignum *d, bignum *n, bignum *result)
 {
     bignum_modpow(c, d, n, result);
