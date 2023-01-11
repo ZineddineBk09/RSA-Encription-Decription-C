@@ -1174,7 +1174,7 @@ Il est question pour cette algorithme de :
  */
 
 /**
- * Complexité totale d'algorithme de cryptage est de O(n^2)
+ * Complexité totale d'algorithme de cryptage est de O(n^2) ()
  * Complexité totale d'algorithme de décryptage est de O(n^3)
  * Complexité totale d'algorithme de génération de clé est de O(n^3)
  */
