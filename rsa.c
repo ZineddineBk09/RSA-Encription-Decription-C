@@ -4,37 +4,39 @@
 #include <string.h>
 #include <limits.h>
 
-/* Accuracy with which we test for prime numbers using Solovay-Strassen algorithm.
- * 20 Tests should be sufficient for most largish primes */
+/* FR: Accurance avec laquelle nous testons pour les nombres premiers en utilisant l'algorithme de Solovay-Strassen.
+ * 20 Tests devrait être suffisant pour la plupart des nombres premiers de taille moyenne
+ */
 #define ACCURACY 20
 
 #define FACTOR_DIGITS 100
 #define EXPONENT_MAX RAND_MAX
 #define BUF_SIZE 1024
 
-/* Initial capacity for a bignum structure. They will flexibly expand but this
- * should be reasonably high to avoid frequent early reallocs */
+/* FR: Capacité initiale pour une structure bignum. Ils s'élargiront de manière flexible mais cela
+ * devrait être raisonnablement élevé pour éviter des reallocs fréquents tôt */
+
 #define BIGNUM_CAPACITY 20
 
 /* Radix and halfradix. These should be changed if the limb/word type changes */
+/* FR: Radix et demi-radix. Ceux-ci devraient être changés si le type de membre / mot change */
 #define RADIX 4294967296UL
 #define HALFRADIX 2147483648UL
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 /**
- * Basic limb type. Note that some calculations rely on unsigned overflow wrap-around of this type.
- * As a result, only unsigned types should be used here, and the RADIX, HALFRADIX above should be
- * changed as necessary. Unsigned integer should probably be the most efficient word type, and this
- * is used by GMP for example.
+ * FR: Type de membre de base. Notez que certaines calculs dépendent de l'overflow non signé de ce type.
+ * En conséquence, seuls les types non signés doivent être utilisés ici, et le RADIX, HALFRADIX ci-dessus devraient être
+ * changé si nécessaire. Entier non signé devrait probablement être le type de mot le plus efficace, et ceci
+ * est utilisé par GMP par exemple.
  */
 typedef unsigned int word;
 
 /**
- * Structure for representing multiple precision integers. This is a base "word" LSB
- * representation. In this case the base, word, is 2^32. Length is the number of words
- * in the current representation. Length should not allow for trailing zeros (Things like
- * 000124). The capacity is the number of words allocated for the limb data.
+ * FR: Structure pour représenter des entiers multiples de précision. Ceci est une base "mot" LSB
+ * représentation. Dans ce cas, la base, le mot, est 2 ^ 32. La longueur est le nombre de mots
+ * dans la représentation actuelle. La longueur ne devrait pas permettre des zéros de queue (Choses comme 000124). La capacité est le nombre de mots alloués pour les données de membre.
  */
 typedef struct _bignum
 {
@@ -44,8 +46,8 @@ typedef struct _bignum
 } bignum;
 
 /**
- * Some forward delcarations as this was requested to be a single file.
- * See specific functions for explanations.
+ * FR: Quelques déclarations de forward comme ceci a été demandé d'être un seul fichier.
+ * Voir les fonctions spécifiques pour les explications.
  */
 void bignum_iadd(bignum *source, bignum *add);
 void bignum_add(bignum *result, bignum *b1, bignum *b2);
@@ -60,8 +62,7 @@ void bignum_imodulate(bignum *source, bignum *modulus);
 void bignum_divide(bignum *quotient, bignum *remainder, bignum *b1, bignum *b2);
 
 /**
- * Save some frequently used bigintegers (0 - 10) so they do not need to be repeatedly
- * created. Used as, NUMS[5] = bignum("5"), etc..
+ * FR: Sauvegarder quelques entiers multiples de précision fréquemment utilisés (0 - 10) afin qu'ils n'aient pas besoin d'être répétés
  */
 word DATA0[1] = {0};
 word DATA1[1] = {1};
@@ -77,10 +78,9 @@ word DATA10[1] = {10};
 bignum NUMS[11] = {{1, 1, DATA0}, {1, 1, DATA1}, {1, 1, DATA2}, {1, 1, DATA3}, {1, 1, DATA4}, {1, 1, DATA5}, {1, 1, DATA6}, {1, 1, DATA7}, {1, 1, DATA8}, {1, 1, DATA9}, {1, 1, DATA10}};
 
 /**
- * Initialize a bignum structure. This is the only way to safely create a bignum
- * and should be called where-ever one is declared. (We realloc the memory in all
- * other cases which is technically safe but may cause problems when we go to free
- * it.)
+ * FR: Initialiser une structure bignum. C'est le seul moyen de créer en toute sécurité un bignum
+ * et devrait être appelé où que l'un est déclaré. (Nous realloc la mémoire dans tous les autres cas
+ * qui est techniquement sûr, mais peut causer des problèmes lorsque nous allons à libérer
  */
 bignum *bignum_init()
 {
@@ -92,7 +92,7 @@ bignum *bignum_init()
 }
 
 /**
- * Free resources used by a bignum. Use judiciously to avoid memory leaks.
+ * FR: Libérer les ressources utilisées par un bignum. Utiliser avec prudence pour éviter les fuites de mémoire.
  */
 void bignum_deinit(bignum *b)
 {
@@ -100,25 +100,19 @@ void bignum_deinit(bignum *b)
     free(b);
 }
 
-/**
- * Check if the given bignum is zero
- */
+// Vérifier si le bignum donné est zéro
 int bignum_iszero(bignum *b)
 {
     return b->length == 0 || (b->length == 1 && b->data[0] == 0);
 }
 
-/**
- * Check if the given bignum is nonzero.
- */
+// Vérifier si le bignum donné est non zéro
 int bignum_isnonzero(bignum *b)
 {
     return !bignum_iszero(b);
 }
 
-/**
- * Copy from source bignum into destination bignum.
- */
+// FR: Copier du bignum source dans le bignum de destination.
 void bignum_copy(bignum *source, bignum *dest)
 {
     dest->length = source->length;
@@ -130,25 +124,24 @@ void bignum_copy(bignum *source, bignum *dest)
     memcpy(dest->data, source->data, dest->length * sizeof(word));
 }
 
-/**
- * Load a bignum from a base 10 string. Only pure numeric strings will work.
- */
+// FR: Charger un bignum à partir d'une chaîne de base 10. Seules les chaînes numériques pures fonctionneront.
 void bignum_fromstring(bignum *b, char *string)
 {
     int i, len = 0;
     while (string[len] != '\0')
-        len++; /* Find string length */
+        len++; // Trouver la taille de string
     for (i = 0; i < len; i++)
     {
         if (i != 0)
-            bignum_imultiply(b, &NUMS[10]);     /* Base 10 multiply */
-        bignum_iadd(b, &NUMS[string[i] - '0']); /* Add */
+            bignum_imultiply(b, &NUMS[10]); // FR: Multiplier par 10
+        bignum_iadd(b, &NUMS[string[i] - '0']);
     }
 }
 
 /**
  * Load a bignum from an unsigned integer.
  */
+// FR: Charger un bignum à partir d'un entier non signé.
 void bignum_fromint(bignum *b, unsigned int num)
 {
     b->length = 1;
@@ -161,10 +154,10 @@ void bignum_fromint(bignum *b, unsigned int num)
 }
 
 /**
- * Print a bignum to stdout as base 10 integer. This is done by
- * repeated division by 10. We can make it more efficient by dividing by
- * 10^9 for example, then doing single precision arithmetic to retrieve the
- * 9 remainders
+ * FR: Imprimer un bignum sur stdout comme entier de base 10. Ceci est fait par
+ * division répétée par 10. Nous pouvons le rendre plus efficace en divisant par
+ * 10^9 par exemple, puis en faisant de l'arithmétique à précision simple pour récupérer le
+ * 9 restes
  */
 void bignum_print(bignum *b)
 {
@@ -194,9 +187,7 @@ void bignum_print(bignum *b)
     free(buffer);
 }
 
-/**
- * Check if two bignums are equal.
- */
+// Vérifier si deux bignums sont égaux.
 int bignum_equal(bignum *b1, bignum *b2)
 {
     int i;
@@ -216,9 +207,7 @@ int bignum_equal(bignum *b1, bignum *b2)
     return 1;
 }
 
-/**
- * Check if bignum b1 is greater than b2
- */
+// Vérifier si le bignum b1 est supérieur au bignum b2
 int bignum_greater(bignum *b1, bignum *b2)
 {
     int i;
@@ -238,9 +227,7 @@ int bignum_greater(bignum *b1, bignum *b2)
     return 0;
 }
 
-/**
- * Check if bignum b1 is less than b2
- */
+// Vérifier si le bignum b1 est inférieur au bignum b2
 int bignum_less(bignum *b1, bignum *b2)
 {
     int i;
@@ -260,25 +247,19 @@ int bignum_less(bignum *b1, bignum *b2)
     return 0;
 }
 
-/**
- * Check if bignum b1 is greater than or equal to b2
- */
+// FR: Vérifier si le bignum b1 est supérieur ou égal au bignum b2
 int bignum_geq(bignum *b1, bignum *b2)
 {
     return !bignum_less(b1, b2);
 }
 
-/**
- * Check if bignum b1 is less than or equal to b2
- */
+// FR: Vérifier si le bignum b1 est inférieur ou égal au bignum b2
 int bignum_leq(bignum *b1, bignum *b2)
 {
     return !bignum_greater(b1, b2);
 }
 
-/**
- * Perform an in place add into the source bignum. That is source += add
- */
+// FR: Effectuer une addition in place dans le bignum source. C'est à dire source += add
 void bignum_iadd(bignum *source, bignum *add)
 {
     bignum *temp = bignum_init();
@@ -287,9 +268,7 @@ void bignum_iadd(bignum *source, bignum *add)
     bignum_deinit(temp);
 }
 
-/**
- * Add two bignums by the add with carry method. result = b1 + b2
- */
+// FR: Additionner deux bignums par la méthode add with carry. result = b1 + b2
 void bignum_add(bignum *result, bignum *b1, bignum *b2)
 {
     word sum, carry = 0;
@@ -306,19 +285,19 @@ void bignum_add(bignum *result, bignum *b1, bignum *b2)
             sum += b1->data[i];
         if (i < b2->length)
             sum += b2->data[i];
-        result->data[i] = sum; /* Already taken mod 2^32 by unsigned wrap around */
+        result->data[i] = sum; // FR: On a déjà pris le modulo 2^32 par le débordement de l'entier signé
 
         if (i < b1->length)
         {
             if (sum < b1->data[i])
-                carry = 1; /* Result must have wrapped 2^32 so carry bit is 1 */
+                carry = 1; // FR: Si le résultat est inférieur à la valeur du premier bignum, alors il y a eu un débordement
             else
                 carry = 0;
         }
         else
         {
             if (sum < b2->data[i])
-                carry = 1; /* Result must have wrapped 2^32 so carry bit is 1 */
+                carry = 1; // FR: Si le résultat est inférieur à la valeur du deuxième bignum, alors il y a eu un débordement
             else
                 carry = 0;
         }
@@ -334,9 +313,7 @@ void bignum_add(bignum *result, bignum *b1, bignum *b2)
     }
 }
 
-/**
- * Perform an in place subtract from the source bignum. That is, source -= sub
- */
+// Effectuer une soustraction in place dans le bignum source. C'est à dire source -= sub
 void bignum_isubtract(bignum *source, bignum *sub)
 {
     bignum *temp = bignum_init();
@@ -346,8 +323,8 @@ void bignum_isubtract(bignum *source, bignum *sub)
 }
 
 /**
- * Subtract bignum b2 from b1. result = b1 - b2. The result is undefined if b2 > b1.
- * This uses the basic subtract with carry method
+ * Soustraire le bignum b2 du bignum b1. result = b1 - b2. Le résultat est indéfini si b2 > b1.
+ * Cette méthode utilise la méthode de soustraction avec retenue
  */
 void bignum_subtract(bignum *result, bignum *b1, bignum *b2)
 {
@@ -362,7 +339,7 @@ void bignum_subtract(bignum *result, bignum *b1, bignum *b2)
     {
         temp = carry;
         if (i < b2->length)
-            temp = temp + b2->data[i]; /* Auto wrapped mod RADIX */
+            temp = temp + b2->data[i];
         diff = b1->data[i] - temp;
         if (temp > b1->data[i])
             carry = 1;
@@ -384,9 +361,7 @@ void bignum_subtract(bignum *result, bignum *b1, bignum *b2)
     result->length = length;
 }
 
-/**
- * Perform an in place multiplication into the source bignum. That is source *= mult
- */
+// FR: Effectuer une multiplication in place dans le bignum source. C'est à dire source *= mult
 void bignum_imultiply(bignum *source, bignum *mult)
 {
     bignum *temp = bignum_init();
@@ -396,16 +371,16 @@ void bignum_imultiply(bignum *source, bignum *mult)
 }
 
 /**
- * Multiply two bignums by the naive school method. result = b1 * b2. I have experimented
- * with FFT mult and Karatsuba but neither was looking to be  more efficient than the school
- * method for reasonable number of digits. There are some improvments to be made here,
- * especially for squaring which can cut out half of the operations.
+ * Multiplier deux bignums par la méthode de l'école. result = b1 * b2. J'ai expérimenté
+ * avec la multiplication par FFT et Karatsuba mais aucune n'était plus efficace que la méthode
+ * de l'école pour un nombre raisonnable de chiffres. Il y a des améliorations à faire ici,
+ * notamment pour la multiplication par un carré qui peut couper la moitié des opérations.
  */
 void bignum_multiply(bignum *result, bignum *b1, bignum *b2)
 {
     int i, j, k;
     word carry, temp;
-    unsigned long long int prod; /* Long for intermediate product... this is not portable and should probably be changed */
+    unsigned long long int prod;
     if (b1->length + b2->length > result->capacity)
     {
         result->capacity = b1->length + b2->length;
@@ -421,7 +396,7 @@ void bignum_multiply(bignum *result, bignum *b1, bignum *b2)
             prod = (b1->data[i] * (unsigned long long int)b2->data[j]) + (unsigned long long int)(result->data[i + j]); /* This should not overflow... */
             carry = (word)(prod / RADIX);
 
-            /* Add carry to the next word over, but this may cause further overflow.. propogate */
+            // FR: Ajouter la retenue au mot suivant, mais cela peut causer un débordement... propager
             k = 1;
             while (carry > 0)
             {
@@ -430,7 +405,7 @@ void bignum_multiply(bignum *result, bignum *b1, bignum *b2)
                     carry = 1;
                 else
                     carry = 0;
-                result->data[i + j + k] = temp; /* Already wrapped in unsigned arithmetic */
+                result->data[i + j + k] = temp;
                 k++;
             }
 
@@ -444,9 +419,7 @@ void bignum_multiply(bignum *result, bignum *b1, bignum *b2)
         result->length = b1->length + b2->length;
 }
 
-/**
- * Perform an in place divide of source. source = source/div.
- */
+// FR: Effectuer une division in place dans le bignum source. C'est à dire source /= div
 void bignum_idivide(bignum *source, bignum *div)
 {
     bignum *q = bignum_init(), *r = bignum_init();
@@ -457,8 +430,8 @@ void bignum_idivide(bignum *source, bignum *div)
 }
 
 /**
- * Perform an in place divide of source, also producing a remainder.
- * source = source/div and remainder = source - source/div.
+ * Effectuer une division in place dans le bignum source. C'est à dire source /= div
+ * et remainder = source - source/div.
  */
 void bignum_idivider(bignum *source, bignum *div, bignum *remainder)
 {
@@ -470,9 +443,7 @@ void bignum_idivider(bignum *source, bignum *div, bignum *remainder)
     bignum_deinit(r);
 }
 
-/**
- * Calculate the remainder when source is divided by div.
- */
+// FR: Calculer le reste de la division de source par div.
 void bignum_remainder(bignum *source, bignum *div, bignum *remainder)
 {
     bignum *q = bignum_init();
@@ -480,9 +451,7 @@ void bignum_remainder(bignum *source, bignum *div, bignum *remainder)
     bignum_deinit(q);
 }
 
-/**
- * Modulate the source by the modulus. source = source % modulus
- */
+// FR: Moduler le source par le modulus. source = source % modulus
 void bignum_imodulate(bignum *source, bignum *modulus)
 {
     bignum *q = bignum_init(), *r = bignum_init();
@@ -493,9 +462,9 @@ void bignum_imodulate(bignum *source, bignum *modulus)
 }
 
 /**
- * Divide two bignums by naive long division, producing both a quotient and remainder.
- * quotient = floor(b1/b2), remainder = b1 - quotient * b2. If b1 < b2 the quotient is
- * trivially 0 and remainder is b2.
+ * Diviser deux bignums par la méthode de la division longue, produisant un quotient et un reste.
+ * quotient = floor(b1/b2), remainder = b1 - quotient * b2. Si b1 < b2 le quotient est
+ * triviallement 0 et le reste est b2.
  */
 void bignum_divide(bignum *quotient, bignum *remainder, bignum *b1, bignum *b2)
 {
@@ -507,17 +476,20 @@ void bignum_divide(bignum *quotient, bignum *remainder, bignum *b1, bignum *b2)
     unsigned long long factor = 1;
     unsigned long long gquot, gtemp, grem;
     if (bignum_less(b1, b2))
-    { /* Trivial case, b1/b2 = 0 iff b1 < b2. */
+    {
+        // Cas trivial, b1/b2 = 0 si b1 < b2
         quotient->length = 0;
         bignum_copy(b1, remainder);
     }
     else if (bignum_iszero(b1))
-    { /* 0/x = 0.. assuming b2 is nonzero */
+    {
+        // FR: Si b1 est nul, le quotient est nul et le reste est nul.
         quotient->length = 0;
         bignum_fromint(remainder, 0);
     }
     else if (b2->length == 1)
-    { /* Division by a single limb means we can do simple division */
+    {
+        // Division par un seul mot, on peut faire une division simple.
         if (quotient->capacity < b1->length)
         {
             quotient->capacity = b1->length;
@@ -536,7 +508,7 @@ void bignum_divide(bignum *quotient, bignum *remainder, bignum *b1, bignum *b2)
         quotient->length = length;
     }
     else
-    { /* Long division is neccessary */
+    {
         n = b1->length + 1;
         m = b2->length;
         if (quotient->capacity < n - m)
@@ -546,9 +518,11 @@ void bignum_divide(bignum *quotient, bignum *remainder, bignum *b1, bignum *b2)
         }
         bignum_copy(b1, b1copy);
         bignum_copy(b2, b2copy);
-        /* Normalize.. multiply by the divisor by 2 until MSB >= HALFRADIX. This ensures fast
-         * convergence when guessing the quotient below. We also multiply the dividend by the
-         * same amount to ensure the result does not change. */
+        /**
+         * Normaliser.. multiplier le diviseur par 2 jusqu'à ce que le MSB >= HALFRADIX. Cela
+         * assure une convergence rapide lors de l'estimation du quotient ci-dessous. On multiplie
+         * aussi le dividende par le même facteur pour s'assurer que le résultat ne change pas.
+         */
         while (b2copy->data[b2copy->length - 1] < HALFRADIX)
         {
             factor *= 2;
@@ -559,8 +533,10 @@ void bignum_divide(bignum *quotient, bignum *remainder, bignum *b1, bignum *b2)
             bignum_fromint(temp, factor);
             bignum_imultiply(b1copy, temp);
         }
-        /* Ensure the dividend is longer than the original (pre-normalized) divisor. If it is not
-         * we introduce a dummy zero word to artificially inflate it. */
+        /**
+         * S'assurer que le dividende est plus long que le diviseur original (pré-normalisé). Si ce n'est pas
+         * le cas, on introduit un mot nul pour artificiellement l'agrandir.
+         */
         if (b1copy->length != n)
         {
             b1copy->length++;
@@ -572,7 +548,7 @@ void bignum_divide(bignum *quotient, bignum *remainder, bignum *b1, bignum *b2)
             b1copy->data[n - 1] = 0;
         }
 
-        /* Process quotient by long division */
+        // FR: Calculer le quotient par division longue.
         for (i = n - m - 1; i >= 0; i--)
         {
             gtemp = RADIX * b1copy->data[i + m] + b1copy->data[i + m - 1];
@@ -581,7 +557,7 @@ void bignum_divide(bignum *quotient, bignum *remainder, bignum *b1, bignum *b2)
                 gquot = UINT_MAX;
             grem = gtemp % b2copy->data[m - 1];
             while (grem < RADIX && gquot * b2copy->data[m - 2] > RADIX * grem + b1copy->data[i + m - 2])
-            { /* Should not overflow... ? */
+            {
                 gquot--;
                 grem += b2copy->data[m - 1];
             }
@@ -624,7 +600,7 @@ void bignum_divide(bignum *quotient, bignum *remainder, bignum *b1, bignum *b2)
         else
             quotient->length = b1->length - b2->length + 1;
 
-        /* Divide by factor now to find final remainder */
+        // Diviser par le facteur maintenant pour trouver le reste final
         carry = 0;
         for (i = b1copy->length - 1; i >= 0; i--)
         {
@@ -646,7 +622,7 @@ void bignum_divide(bignum *quotient, bignum *remainder, bignum *b1, bignum *b2)
 }
 
 /**
- * Perform modular exponentiation by repeated squaring. This will compute
+ * Effectuer l'exponentiation modulaire par répétition de la puissance carrée. Cela calculera
  * result = base^exponent mod modulus
  */
 void bignum_modpow(bignum *base, bignum *exponent, bignum *modulus, bignum *result)
@@ -676,9 +652,7 @@ void bignum_modpow(bignum *base, bignum *exponent, bignum *modulus, bignum *resu
     bignum_deinit(remainder);
 }
 
-/**
- * Compute the gcd of two bignums. result = gcd(b1, b2)
- */
+// Calculer le pgcd de deux bignums. result = pgcd (b1, b2)
 void bignum_gcd(bignum *b1, bignum *b2, bignum *result)
 {
     bignum *a = bignum_init(), *b = bignum_init(), *remainder = bignum_init();
@@ -700,9 +674,7 @@ void bignum_gcd(bignum *b1, bignum *b2, bignum *result)
     bignum_deinit(discard);
 }
 
-/**
- * Compute the inverse of a mod m. Or, result = a^-1 mod m.
- */
+// Calculer l'inverse de a mod m. Ou, result = a^-1 mod m.
 void bignum_inverse(bignum *a, bignum *m, bignum *result)
 {
     bignum *remprev = bignum_init(), *rem = bignum_init();
@@ -716,8 +688,10 @@ void bignum_inverse(bignum *a, bignum *m, bignum *result)
     while (bignum_greater(rem, &NUMS[1]))
     {
         bignum_divide(qcur, rcur, remprev, rem);
-        /* Observe we are finding the inverse in a finite field so we can use
-         * a modified algorithm that avoids negative numbers here */
+        /*
+    Observation: on trouve l'inverse dans un corps fini, donc on peut utiliser
+    un algorithme modifié qui évite les nombres négatifs ici
+*/
         bignum_subtract(acur, m, qcur);
         bignum_imultiply(acur, aux);
         bignum_iadd(acur, auxprev);
@@ -740,9 +714,7 @@ void bignum_inverse(bignum *a, bignum *m, bignum *result)
     bignum_deinit(acur);
 }
 
-/**
- * Compute the jacobi symbol, J(ac, nc).
- */
+// Calculer le symbole de Jacobi, J(ac, nc).
 int bignum_jacobi(bignum *ac, bignum *nc)
 {
     bignum *remainder = bignum_init(), *twos = bignum_init();
@@ -756,13 +728,13 @@ int bignum_jacobi(bignum *ac, bignum *nc)
         if (bignum_leq(a, &NUMS[1]) || bignum_equal(a, n))
             break;
         bignum_fromint(twos, 0);
-        /* Factor out multiples of two */
+        // Factoriser les multiples de deux
         while (a->data[0] % 2 == 0)
         {
             bignum_iadd(twos, &NUMS[1]);
             bignum_idivide(a, &NUMS[2]);
         }
-        /* Coefficient for flipping */
+        // Coeff
         if (bignum_greater(twos, &NUMS[0]) && twos->data[0] % 2 == 1)
         {
             bignum_remainder(n, &NUMS[8], remainder);
@@ -793,9 +765,7 @@ int bignum_jacobi(bignum *ac, bignum *nc)
     return result;
 }
 
-/**
- * Check whether a is a Euler witness for n. That is, if a^(n - 1)/2 != Ja(a, n) mod n
- */
+// Vérifier si a est un témoin de Euler pour n. C'est-à-dire, si a^(n - 1)/2 != Ja(a, n) mod n
 int solovayPrime(int a, bignum *n)
 {
     bignum *ab = bignum_init(), *res = bignum_init(), *pow = bignum_init();
@@ -821,9 +791,7 @@ int solovayPrime(int a, bignum *n)
     return result;
 }
 
-/**
- * Test if n is probably prime, by repeatedly using the Solovay-Strassen primality test.
- */
+// Vérifier si n est probablement premier, en utilisant le test de Solovay-Strassen.
 int probablePrime(bignum *n, int k)
 {
     if (bignum_equal(n, &NUMS[2]))
@@ -848,16 +816,16 @@ int probablePrime(bignum *n, int k)
 }
 
 /**
- * Generate a random prime number, with a specified number of digits.
- * This will generate a base 10 digit string of given length, convert it
- * to a bignum and then do an increasing search for the first probable prime.
+ * Générer un nombre premier aléatoire, avec un nombre spécifié de chiffres.
+ * Cela générera une chaîne de chiffres de base 10 de longueur donnée, la convertira
+ * en un bignum et puis fera une recherche croissante pour le premier nombre premier probable.
  */
 void randPrime(int numDigits, bignum *result)
 {
     char *string = malloc((numDigits + 1) * sizeof(char));
     int i;
-    string[0] = (rand() % 9) + '1';                 /* No leading zeros */
-    string[numDigits - 1] = (rand() % 5) * 2 + '1'; /* Last digit is odd */
+    string[0] = (rand() % 9) + '1';                 // Fr: Pas de zéros initiaux
+    string[numDigits - 1] = (rand() % 5) * 2 + '1'; // Fr: Dernier chiffre impair
     for (i = 1; i < numDigits - 1; i++)
         string[i] = (rand() % 10) + '0';
     string[numDigits] = '\0';
@@ -1128,7 +1096,6 @@ int main(void)
     return EXIT_SUCCESS;
 }
 
-
 // now let's analyse the complexity of the algorithm in space and time
 
 // we have 3 functions, each of which has a complexity of O(n^2)
@@ -1137,6 +1104,5 @@ int main(void)
 // the space complexity is O(n) + O(n) + O(n) = O(n)
 // also the time complexity depends on the length of our key, which is O(n^2)
 // so the total time complexity is O(n^2) + O(n^2) + O(n^2) = O(n^2)
-
 
 // if you disagree with my analysis, please let me know in the comments or contact me on my website or email
