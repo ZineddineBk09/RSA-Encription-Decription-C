@@ -1098,6 +1098,7 @@ int main(void)
     return EXIT_SUCCESS;
 }
 
+
 /**
  * RSA (Ronald Rivest, Adi Shamir et Leonard Adleman): C’est un algorithme de cryptage asymétrique basé sur deux clés une publique utilisé pour le chiffrement et une clé privé pour le déchiffrement. Il chiffrement se base sur le calcul du modulo et le déchiffrement sur le calcul de l’inverse module. De manière générale, il se base sur l’exponentiation modulaire.
 Il est question pour cette algorithme de :
