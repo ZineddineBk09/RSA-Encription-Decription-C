@@ -7,10 +7,10 @@ import randnum
 
 def _find_prime(nbits: int, pipe: Connection) -> None:
     while True:
-        integer = rsa.randnum.read_random_odd_int(nbits)
+        integer = randnum.read_random_odd_int(nbits)
 
         # Test for primeness
-        if rsa.prime.is_prime(integer):
+        if prime.is_prime(integer):
             pipe.send(integer)
             return
 
@@ -38,7 +38,8 @@ def getprime(nbits: int, poolsize: int) -> int:
 
     # Create processes
     try:
-        procs = [mp.Process(target=_find_prime, args=(nbits, pipe_send)) for _ in range(poolsize)]
+        procs = [mp.Process(target=_find_prime, args=(nbits, pipe_send))
+                 for _ in range(poolsize)]
         # Start processes
         for p in procs:
             p.start()
