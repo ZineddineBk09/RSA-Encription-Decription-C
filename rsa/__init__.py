@@ -12,6 +12,7 @@ from pkcs1 import (
 )
 
 if __name__ == "__main__":
+
     ################## Key generation ##################
     print('################## Key generation ##################')
 
