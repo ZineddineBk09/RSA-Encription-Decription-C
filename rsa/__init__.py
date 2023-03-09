@@ -11,7 +11,6 @@ from pkcs1 import (
     compute_hash,
 )
 
-# Do doctest if we're run directly
 if __name__ == "__main__":
     ################## Key generation ##################
     print('################## Key generation ##################')
@@ -39,7 +38,6 @@ if __name__ == "__main__":
     with open("target_file.txt.enc", "wb") as f:
         f.write(ciphertext)
 
-
     ################## Decryption ##################
     print('################## Decryption ##################')
 
@@ -50,7 +48,8 @@ if __name__ == "__main__":
     with open("target_file.txt.enc", "rb") as f:
         ciphertext = f.read()
         # split the file into chunks of 128 bytes
-        chunks = [ciphertext[i: i + 128] for i in range(0, len(ciphertext), 128)]
+        chunks = [ciphertext[i: i + 128]
+                  for i in range(0, len(ciphertext), 128)]
         # decrypt each chunk
         plaintext = b"".join(decrypt(chunk, privkey) for chunk in chunks)
 
