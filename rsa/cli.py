@@ -220,14 +220,14 @@ class DecryptOperation(CryptoOperation):
     operation = "decrypt"
     operation_past = "decrypted"
     operation_progressive = "decrypting"
-    key_class = rsa.PrivateKey
+    key_class = PrivateKey
 
     def perform_operation(
         self, indata: bytes, priv_key: key.AbstractKey, cli_args: Indexable = ()
     ) -> bytes:
         """Decrypts files."""
         assert isinstance(priv_key, key.PrivateKey)
-        return rsa.decrypt(indata, priv_key)
+        return decrypt(indata, priv_key)
 
 
 class SignOperation(CryptoOperation):
@@ -242,7 +242,7 @@ class SignOperation(CryptoOperation):
     operation = "sign"
     operation_past = "signature"
     operation_progressive = "Signing"
-    key_class = rsa.PrivateKey
+    key_class = key.PrivateKey
     expected_cli_args = 2
 
     output_help = (
