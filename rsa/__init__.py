@@ -22,6 +22,7 @@ if __name__ == "__main__":
     print("pubkey: %s %s" % (pubkey.n, pubkey.e))
     print("privkey: %s %s" % (privkey.n, privkey.d))
 
+
     ################## Encryption ##################
     print('################## Encryption ##################')
 
@@ -37,6 +38,7 @@ if __name__ == "__main__":
 
     with open("target_file.txt.enc", "wb") as f:
         f.write(ciphertext)
+
 
     ################## Decryption ##################
     print('################## Decryption ##################')
@@ -55,6 +57,7 @@ if __name__ == "__main__":
 
     with open("target_file.txt.dec", "wb") as f:
         f.write(plaintext)
+
 
     ################## Signing ##################
     print('################## Signing ##################')
