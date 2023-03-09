@@ -276,7 +276,7 @@ class VerifyOperation(CryptoOperation):
     operation = "verify"
     operation_past = "verified"
     operation_progressive = "Verifying"
-    key_class = rsa.PublicKey
+    key_class = key.PublicKey
     expected_cli_args = 2
     has_output = False
 
