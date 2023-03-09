@@ -202,10 +202,10 @@ class EncryptOperation(CryptoOperation):
     operation_progressive = "encrypting"
 
     def perform_operation(
-        self, indata: bytes, pub_key: rsa.key.AbstractKey, cli_args: Indexable = ()
+        self, indata: bytes, pub_key: key.AbstractKey, cli_args: Indexable = ()
     ) -> bytes:
         """Encrypts files."""
-        assert isinstance(pub_key, rsa.key.PublicKey)
+        assert isinstance(pub_key, key.PublicKey)
         return rsa.encrypt(indata, pub_key)
 
 
@@ -223,10 +223,10 @@ class DecryptOperation(CryptoOperation):
     key_class = rsa.PrivateKey
 
     def perform_operation(
-        self, indata: bytes, priv_key: rsa.key.AbstractKey, cli_args: Indexable = ()
+        self, indata: bytes, priv_key: key.AbstractKey, cli_args: Indexable = ()
     ) -> bytes:
         """Decrypts files."""
-        assert isinstance(priv_key, rsa.key.PrivateKey)
+        assert isinstance(priv_key, key.PrivateKey)
         return rsa.decrypt(indata, priv_key)
 
 
@@ -251,10 +251,10 @@ class SignOperation(CryptoOperation):
     )
 
     def perform_operation(
-        self, indata: bytes, priv_key: rsa.key.AbstractKey, cli_args: Indexable
+        self, indata: bytes, priv_key: key.AbstractKey, cli_args: Indexable
     ) -> bytes:
         """Signs files."""
-        assert isinstance(priv_key, rsa.key.PrivateKey)
+        assert isinstance(priv_key, key.PrivateKey)
 
         hash_method = cli_args[1]
         if hash_method not in HASH_METHODS:
@@ -281,10 +281,10 @@ class VerifyOperation(CryptoOperation):
     has_output = False
 
     def perform_operation(
-        self, indata: bytes, pub_key: rsa.key.AbstractKey, cli_args: Indexable
+        self, indata: bytes, pub_key: key.AbstractKey, cli_args: Indexable
     ) -> None:
         """Verifies files."""
-        assert isinstance(pub_key, rsa.key.PublicKey)
+        assert isinstance(pub_key, key.PublicKey)
 
         signature_file = cli_args[1]
 
