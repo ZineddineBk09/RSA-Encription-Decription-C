@@ -261,7 +261,7 @@ class SignOperation(CryptoOperation):
             raise SystemExit("Invalid hash method, choose one of %s" %
                              ", ".join(HASH_METHODS))
 
-        return rsa.sign(indata, priv_key, hash_method)
+        return sign(indata, priv_key, hash_method)
 
 
 class VerifyOperation(CryptoOperation):
