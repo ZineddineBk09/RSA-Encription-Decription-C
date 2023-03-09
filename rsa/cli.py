@@ -220,7 +220,7 @@ class DecryptOperation(CryptoOperation):
     operation = "decrypt"
     operation_past = "decrypted"
     operation_progressive = "decrypting"
-    key_class = PrivateKey
+    key_class = key.PrivateKey
 
     def perform_operation(
         self, indata: bytes, priv_key: key.AbstractKey, cli_args: Indexable = ()
