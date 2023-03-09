@@ -35,7 +35,8 @@ def bit_size(num: int) -> int:
     try:
         return num.bit_length()
     except AttributeError as ex:
-        raise TypeError("bit_size(num) only supports integers, not %r" % type(num)) from ex
+        raise TypeError(
+            "bit_size(num) only supports integers, not %r" % type(num)) from ex
 
 
 def byte_size(number: int) -> int:
