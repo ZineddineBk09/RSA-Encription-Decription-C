@@ -292,8 +292,8 @@ class VerifyOperation(CryptoOperation):
             signature = sigfile.read()
 
         try:
-            rsa.verify(indata, signature, pub_key)
-        except rsa.VerificationError as ex:
+            pkcs1.verify(indata, signature, pub_key)
+        except pkcs1.VerificationError as ex:
             raise SystemExit("Verification failed.") from ex
 
         print("Verification OK", file=sys.stderr)
