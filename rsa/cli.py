@@ -94,7 +94,7 @@ class CryptoOperation(metaclass=abc.ABCMeta):
     expected_cli_args = 1
     has_output = True
 
-    key_class = rsa.PublicKey  # type: typing.Type[rsa.key.AbstractKey]
+    key_class = key.PublicKey  # type: typing.Type[rsa.key.AbstractKey]
 
     def __init__(self) -> None:
         self.usage = self.usage % self.__class__.__dict__
@@ -103,7 +103,7 @@ class CryptoOperation(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def perform_operation(
-        self, indata: bytes, key: rsa.key.AbstractKey, cli_args: Indexable
+        self, indata: bytes, key: key.AbstractKey, cli_args: Indexable
     ) -> typing.Any:
         """Performs the program's operation.
 
