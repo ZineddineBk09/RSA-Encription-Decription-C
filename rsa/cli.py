@@ -94,7 +94,7 @@ class CryptoOperation(metaclass=abc.ABCMeta):
     expected_cli_args = 1
     has_output = True
 
-    key_class = key.PublicKey  # type: typing.Type[rsa.key.AbstractKey]
+    key_class = key.PublicKey  # type: typing.Type[key.AbstractKey]
 
     def __init__(self) -> None:
         self.usage = self.usage % self.__class__.__dict__
@@ -157,7 +157,7 @@ class CryptoOperation(metaclass=abc.ABCMeta):
 
         return cli, cli_args
 
-    def read_key(self, filename: str, keyform: str) -> rsa.key.AbstractKey:
+    def read_key(self, filename: str, keyform: str) -> key.AbstractKey:
         """Reads a public or private key."""
 
         print("Reading %s key from %s" %
