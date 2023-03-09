@@ -3,7 +3,6 @@ import sys
 import typing
 import optparse
 
-import rsa
 import key
 import pkcs1
 
@@ -57,7 +56,7 @@ def keygen() -> None:
         raise SystemExit(1) from ex
 
     print("Generating %i-bit key" % keysize, file=sys.stderr)
-    (pub_key, priv_key) = rsa.newkeys(keysize)
+    (pub_key, priv_key) = key.newkeys(keysize)
 
     # Save public key
     if cli.pubout:
