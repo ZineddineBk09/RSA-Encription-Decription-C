@@ -206,7 +206,7 @@ class EncryptOperation(CryptoOperation):
     ) -> bytes:
         """Encrypts files."""
         assert isinstance(pub_key, key.PublicKey)
-        return rsa.encrypt(indata, pub_key)
+        return encrypt(indata, pub_key)
 
 
 class DecryptOperation(CryptoOperation):
