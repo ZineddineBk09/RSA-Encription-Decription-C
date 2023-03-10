@@ -14,7 +14,7 @@ from pkcs1 import (
 
 
 # create a function that encrypt a file and take the path of the file as an argument
-def encrypt_file(file_path, pubkey):
+def encrypt_file(file_path, folder_path, pubkey):
     # we will use the public key to encrypt target_file.txt, and the private key to decrypt it
     # the block size is 128 bytes, so we will read the file in 128 byte chunks
     # and encrypt each chunk separately
@@ -25,12 +25,12 @@ def encrypt_file(file_path, pubkey):
         # encrypt each chunk
         ciphertext = b"".join(encrypt(chunk, pubkey) for chunk in chunks)
 
-    with open(file_path + ".enc", "wb") as f:
+    with open(folder_path + os.path.basename(file_path) + ".enc", "wb") as f:
         f.write(ciphertext)
 
 
 # create a function that decrypt a file and take the path of the file as an argument
-def decrypt_file(file_path, privkey):
+def decrypt_file(file_path, folder_path, privkey):
     # we will use the private key to decrypt target_file.txt.enc, and the public key to verify it
     # the block size is 128 bytes, so we will read the file in 128 byte chunks
     # and decrypt each chunk separately
@@ -43,17 +43,18 @@ def decrypt_file(file_path, privkey):
         # decrypt each chunk
         plaintext = b"".join(decrypt(chunk, privkey) for chunk in chunks)
 
-    with open(file_path + ".dec", "wb") as f:
+    with open(folder_path + os.path.basename(file_path) + ".dec", "wb") as f:
         f.write(plaintext)
 
 
 # create a function that sign a file and take the path of the file as an argument
-def sign_file(file_path, privkey):
+def sign_file(file_path, folder_path, privkey):
     # sign target_file.txt
     with open(file_path, "rb") as f:
         message = f.read()
     signature = sign(message, privkey, "SHA-256")
-    with open(file_path + ".sig", "wb") as f:
+
+    with open(folder_path + os.path.basename(file_path) + ".sig", "wb") as f:
         f.write(signature)
 
 # create a function that verify a file and take the path of the file as an argument
@@ -63,13 +64,15 @@ def verify_file(file_path, pubkey):
     # verify target_file.txt.sig
     with open(file_path, "rb") as f:
         message = f.read()
+
     with open(file_path + ".sig", "rb") as f:
         signature = f.read()
+
     try:
         verify(message, signature, pubkey)
-        print("signature is valid")
+        print("signature is valid for %s" % file_path)
     except VerificationError:
-        print("signature is invalid")
+        print("signature is invalid for %s" % file_path)
 
 
 # main2 to encrypt, decrypt and sign a folder of files
@@ -107,8 +110,7 @@ def main():
 
     # encrypt each file in the folder
     for file in files_enc:
-        encrypt_file(folder_path_enc + '/' + file, pubkey)
-
+        encrypt_file(folder_path + '/' + file, folder_path_enc, pubkey)
     ################## Decryption ##################
     print('################## Decryption ##################')
 
@@ -116,7 +118,7 @@ def main():
 
     # decrypt each file in the folder
     for file in files_dec:
-        decrypt_file(folder_path_dec + '/' + file, privkey)
+        decrypt_file(folder_path_enc + '/' + file, folder_path_dec, privkey)
 
     ################## Signing ##################
     print('################## Signing ##################')
@@ -125,7 +127,7 @@ def main():
 
     # sign each file in the folder
     for file in files_sig:
-        sign_file(folder_path_sig + '/' + file, privkey)
+        sign_file(folder_path_dec + '/' + file, folder_path_sig, privkey)
 
     ################## Verification ##################
     print('################## Verification ##################')
