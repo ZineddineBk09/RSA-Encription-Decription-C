@@ -25,7 +25,9 @@ def encrypt_file(file_path, folder_path, pubkey):
         # encrypt each chunk
         ciphertext = b"".join(encrypt(chunk, pubkey) for chunk in chunks)
 
-    with open(folder_path + os.path.basename(file_path) + ".enc", "wb") as f:
+    with open(folder_path + '/' + os.path.basename(file_path) + ".enc", "wb") as f:
+        print("encrypted file: %s" % folder_path +
+              os.path.basename(file_path) + ".enc")
         f.write(ciphertext)
 
 
@@ -43,29 +45,27 @@ def decrypt_file(file_path, folder_path, privkey):
         # decrypt each chunk
         plaintext = b"".join(decrypt(chunk, privkey) for chunk in chunks)
 
-    with open(folder_path + os.path.basename(file_path) + ".dec", "wb") as f:
+    with open(folder_path + '/' + os.path.basename(file_path) + ".dec", "wb") as f:
         f.write(plaintext)
 
 
 # create a function that sign a file and take the path of the file as an argument
 def sign_file(file_path, folder_path, privkey):
-    # sign target_file.txt
     with open(file_path, "rb") as f:
         message = f.read()
     signature = sign(message, privkey, "SHA-256")
 
-    with open(folder_path + os.path.basename(file_path) + ".sig", "wb") as f:
+    with open(folder_path + '/' + os.path.basename(file_path) + ".sig", "wb") as f:
         f.write(signature)
 
+
 # create a function that verify a file and take the path of the file as an argument
-
-
 def verify_file(file_path, pubkey):
-    # verify target_file.txt.sig
+    print("verifying %s" % file_path)
     with open(file_path, "rb") as f:
         message = f.read()
 
-    with open(file_path + ".sig", "rb") as f:
+    with open(file_path, "rb") as f:
         signature = f.read()
 
     try:
@@ -111,6 +111,7 @@ def main():
     # encrypt each file in the folder
     for file in files_enc:
         encrypt_file(folder_path + '/' + file, folder_path_enc, pubkey)
+
     ################## Decryption ##################
     print('################## Decryption ##################')
 
@@ -118,6 +119,7 @@ def main():
 
     # decrypt each file in the folder
     for file in files_dec:
+        print("Decrypting file: " + file)
         decrypt_file(folder_path_enc + '/' + file, folder_path_dec, privkey)
 
     ################## Signing ##################
@@ -127,6 +129,7 @@ def main():
 
     # sign each file in the folder
     for file in files_sig:
+        print("Signing file: " + file)
         sign_file(folder_path_dec + '/' + file, folder_path_sig, privkey)
 
     ################## Verification ##################
