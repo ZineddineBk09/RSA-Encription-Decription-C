@@ -60,12 +60,12 @@ def sign_file(file_path, folder_path, privkey):
 
 
 # create a function that verify a file and take the path of the file as an argument
-def verify_file(file_path, pubkey):
+def verify_file(file_path, signature_path, pubkey):
     print("verifying %s" % file_path)
     with open(file_path, "rb") as f:
         message = f.read()
 
-    with open(file_path, "rb") as f:
+    with open(signature_path, "rb") as f:
         signature = f.read()
 
     try:
@@ -139,7 +139,9 @@ def main():
 
     # verify each file in the folder
     for file in files_ver:
-        verify_file(folder_path_sig + '/' + file, pubkey)
+        # pqss file to check without .sig
+        verify_file(folder_path_dec + '/' + file.split('.sig')[0],
+                    folder_path_sig + '/' + file, pubkey)
 
 
 if __name__ == "__main__":
