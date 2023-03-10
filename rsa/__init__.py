@@ -94,6 +94,14 @@ def main2():
     folder_path_enc = input(
         "Enter the path where the encrypted files will be stored: ")
 
+    # get the path where the decrypted files will be stored
+    folder_path_dec = input(
+        "Enter the path where the decrypted files will be stored: ")
+
+    # get the path where the signed files will be stored
+    folder_path_sig = input(
+        "Enter the path where the signed files will be stored: ")
+
     # get the list of files in the folder
     files = os.listdir(folder_path)
 
