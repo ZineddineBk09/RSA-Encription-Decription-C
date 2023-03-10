@@ -90,28 +90,22 @@ def main2():
     # get the path of the folder to encrypt
     folder_path = input("Enter the path of the folder to encrypt: ")
 
-    '''# get the path of the folder to store the encrypted files
-    encrypted_folder_path = input(
-        'Enter the path of the folder to store the encrypted files: ')
+    # get the path where the encrypted files will be stored
+    folder_path_enc = input(
+        "Enter the path where the encrypted files will be stored: ")
 
-    # get the path of the folder to store the decrypted files
-    decrypted_folder_path = input(
-        'Enter the path of the folder to store the decrypted files: ')
-
-    # get the path of the folder to store the signed files
-    signed_folder_path = input(
-        'Enter the path of the folder to store the signed files: ')
-
-    # get the path of the folder to store the verified files
-    verified_folder_path = input(
-        'Enter the path of the folder to store the verified files: ')
-'''
     # get the list of files in the folder
     files = os.listdir(folder_path)
-    print(files)
+
     # encrypt each file in the folder
     for file in files:
-        encrypt_file(folder_path + '/' + file, pubkey)
+        encrypt_file(folder_path_enc + '/' + file, pubkey)
+
+    ################## Decryption ##################
+    print('################## Decryption ##################')
+
+    # get the path of the folder to decrypt
+    folder_path_dec = input("Enter the path of the folder to decrypt: ")
 
 
 if __name__ == "__main__":
