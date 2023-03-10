@@ -73,7 +73,7 @@ def verify_file(file_path, pubkey):
 
 
 # main2 to encrypt, decrypt and sign a folder of files
-def main2():
+def main():
     ################## Key generation ##################
     print('################## Key generation ##################')
 
@@ -103,22 +103,43 @@ def main2():
         "Enter the path where the signed files will be stored: ")
 
     # get the list of files in the folder
-    files = os.listdir(folder_path)
+    files_enc = os.listdir(folder_path)
 
     # encrypt each file in the folder
-    for file in files:
+    for file in files_enc:
         encrypt_file(folder_path_enc + '/' + file, pubkey)
 
     ################## Decryption ##################
     print('################## Decryption ##################')
 
-    # get the path of the folder to decrypt
-    folder_path_dec = input("Enter the path of the folder to decrypt: ")
+    files_dec = os.listdir(folder_path_enc)
+
+    # decrypt each file in the folder
+    for file in files_dec:
+        decrypt_file(folder_path_dec + '/' + file, privkey)
+
+    ################## Signing ##################
+    print('################## Signing ##################')
+
+    files_sig = os.listdir(folder_path_dec)
+
+    # sign each file in the folder
+    for file in files_sig:
+        sign_file(folder_path_sig + '/' + file, privkey)
+
+    ################## Verification ##################
+    print('################## Verification ##################')
+
+    files_ver = os.listdir(folder_path_sig)
+
+    # verify each file in the folder
+    for file in files_ver:
+        verify_file(folder_path_sig + '/' + file, pubkey)
 
 
 if __name__ == "__main__":
 
-    main2()
+    main()
 
 __all__ = [
     "newkeys",
